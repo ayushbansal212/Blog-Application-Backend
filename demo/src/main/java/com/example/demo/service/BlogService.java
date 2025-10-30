@@ -1,8 +1,10 @@
 package com.example.demo.service;
 
 import com.example.demo.Entity.Blog;
+import com.example.demo.Entity.Comments;
 import com.example.demo.Entity.User;
 import com.example.demo.Repository.BlogRepo;
+import com.example.demo.Repository.CommentsRepo;
 import com.example.demo.Repository.UserRepo;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,8 @@ public class BlogService {
     BlogRepo blogRepo;
     @Autowired
     UserRepo userRepo;
+    @Autowired
+    CommentsRepo commentsRepo;
     public Blog saveBlog(Blog blog){
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user =userRepo.findByUsername(username);
@@ -29,7 +33,6 @@ public class BlogService {
         return null ;
     }
     public List<Blog> getAllBlogs(){
-        System.out.println(blogRepo.findAll());
         return blogRepo.findAll();
     }
     public List<Blog> getAllBlogsOfUser(ObjectId id){
@@ -49,9 +52,20 @@ public class BlogService {
     public void deleteBlog(ObjectId id){
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user =userRepo.findByUsername(username);
-        user.getBlogsList().remove(blogRepo.findById(id));
-        user.setBlogsCount(user.getBlogsCount()-1);
-        blogRepo.deleteById(id);
-        userRepo.save(user);
+        Optional<Blog> blog=blogRepo.findById(id);
+        if(blog.isPresent()){
+            Blog blogToBeDeleted=blog.get();
+            user.getBlogsList().remove(blogToBeDeleted);
+            blogRepo.deleteById(id);
+            deleteBlogComments(blogToBeDeleted);
+            user.setBlogsCount(user.getBlogsCount()-1);
+            userRepo.save(user);
+        }
+
+    }
+    public void deleteBlogComments (Blog blog){
+        for(Comments comments:blog.getComments()){
+            commentsRepo.deleteById(comments.getId());
+        }
     }
 }

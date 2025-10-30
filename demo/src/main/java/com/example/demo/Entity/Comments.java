@@ -13,6 +13,6 @@ public class Comments {
     @Id
     @ToString.Exclude
     ObjectId id;
-    String name;
     String contents;
+    ObjectId blogId;
 }

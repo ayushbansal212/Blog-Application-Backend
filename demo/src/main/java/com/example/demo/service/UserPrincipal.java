@@ -12,7 +12,6 @@ public class UserPrincipal implements UserDetails {
     User user;
     @Autowired
     public UserPrincipal(User user) {
-        System.out.println(user);
         this.user=user;
     }
 

@@ -32,7 +32,7 @@ public class Security {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable);
         http.authorizeHttpRequests((authz) -> authz
-                .requestMatchers("/api/comments/**","/api/user/**","/error/**","/api/blogs/**").permitAll()
+                .requestMatchers("/api/comments/get/**","/api/user/**","/error/**","/api/blogs/**").permitAll()
                 .anyRequest().authenticated()
         );
 
@@ -53,7 +53,6 @@ public class Security {
     public FilterRegistrationBean<Filter> loggingFilter() {
         FilterRegistrationBean<Filter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter((request, response, chain) -> {
-            System.out.println("Spring Security filter triggered: " + ((HttpServletRequest) request).getRequestURI());
             chain.doFilter(request, response);
         });
         registrationBean.addUrlPatterns("/*");
